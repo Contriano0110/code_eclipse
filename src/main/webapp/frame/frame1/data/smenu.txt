@@ -1,0 +1,6 @@
+﻿[
+    { "id": "s1", iconCls: "fa fa-book", text: "课题广场", url: "../../demo/datagrid/sgdt_info.html" },
+    { "id": "s2", iconCls: "fa fa-coffee", text: "教师信息", url: "../../demo/datagrid/steacher_info.html" },
+    { "id": "s3", iconCls: "fa fa-barcode", text: "我的申报", url: "../../demo/datagrid/sapply_info.html" },
+    { "id": "s4", iconCls: "fa fa-table", text: "我的课题", url: "../../demo/chat/mygdt.html" }
+]

@@ -1,0 +1,151 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script src="./scripts/boot.js" type="text/javascript"></script>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column" style="font-size:15px;">
+            <form id="form1" role="form" action="javascript:void(0)"
+                  style="position: absolute;left: 40%;top: 10%;">
+                <h2 style="padding-left: 100px;">用&nbsp;户&nbsp;信&nbsp;息</h2>
+                <h5 id="ts" style="color:red;height: 5px"></h5>
+                <div class="form-group" style="margin-bottom:25px;">  <!-- 显示sid -->
+                	<label for="sid" style="width:55px;display:inline-block;">学&nbsp;&nbsp;&nbsp;号</label>
+                    <input style="padding-left: 10px;width: 240px;"
+                       	 class="mini-textbox" id="sid" name="sid" readonly/>     
+                </div>
+                <div id="pwd" class="form-group" style="margin-bottom:25px;display:block"> <!-- 如果没有密码则展示该输入框 : 设置密码 -->
+                	<label for="passwd" style="width:55px;display:inline-block;">密&nbsp;&nbsp;&nbsp;码</label>
+                    <input style="padding-left: 10px;width: 240px;"
+                       	 class="mini-textbox" id="passwd" name="passwd" type="password" placeholder="请设置密码"/>     
+                </div>
+                <div class="form-group" style="margin-bottom:25px;"> <!-- 设置姓名 -->
+                	<label for="sname" style="width:55px;display:inline-block;">姓&nbsp;&nbsp;&nbsp;名</label>
+                    <input style="padding-left: 10px;width: 240px;"
+                       	 class="mini-textbox" id="sname" name="sname" placeholder="请输入你的名字"/>     
+                </div>
+                <div class="form-group" style="margin-bottom:25px;"> <!-- 设置性别 -->
+                	<label for="ssex" style="width:55px;display:inline-block;">性&nbsp;&nbsp;&nbsp;别</label>
+                    <select id="ssex" name="ssex" class="mini-combobox" style="padding-left: 10px;width: 240px;">                    
+                        <option value=""></option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:25px;">
+                	<label for="sage" style="width:55px;display:inline-block;">年&nbsp;&nbsp;&nbsp;龄</label>
+                    <input class="mini-spinner" style="padding-left: 10px;width: 240px;"
+                    	 class="mini-textbox" id="sage" name="sage" minValue="15" maxValue="30"/>
+                </div>       
+                <div class="form-group" style="margin-bottom:25px;"> <!-- 更改邮箱 -->
+                	<label for="smail" style="width:55px;display:inline-block;">邮&nbsp;&nbsp;&nbsp;箱</label>
+                    <input style="padding-left: 10px;width: 240px;"
+                        class="mini-textbox"	id="smail" name="smail" placeholder="请输入邮箱"/>     
+                </div>
+                <button type="button" style="width: 130px;height: 30px;margin-top: 30px;
+                	cursor: pointer;background-color: #ffcccc;border-radius: 8px;"onclick="updateinfo()">
+                    提交
+                </button>
+                <a href="javascript:history.back()">
+                    <button type="button" style="width: 130px;height: 30px;margin-top: 30px;
+                		cursor: pointer;background-color: #ffcccc;border-radius: 8px;margin-left:34px;">
+                    	返回
+                	</button>
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts = document.getElementById("ts")
+    var form = new mini.Form("form1");
+    var flag = "new"
+    
+    function getInfo() {
+    	
+    	$.ajax({
+            url: "studentinfoaction",
+            cache: true,
+            data: {method: "getInfo"},
+            success: function (text) {
+                console.log(text)
+                form.setData(text)    
+                console.log(text.passwd)
+                if (text.passwd != null) {
+                	$("#pwd").hide()
+                	flag = "old"
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {  
+                console.error("AJAX error: " + textStatus, errorThrown);  
+            }
+        });
+    };
+    
+ 	// 页面加载完成后调用 getInfo 函数  
+    $(document).ready(function() {  
+        getInfo()
+    });
+ 	
+    function updateinfo() {
+        ts.innerHTML = ""
+        var sid = mini.get("sid").getValue();
+        var passwd = mini.get("passwd").getValue();
+        var sname = mini.get("sname").getValue();
+        var ssex = mini.get("ssex").getValue();
+        var sage = mini.get("sage").getValue();
+        var smail = mini.get("smail").getValue();
+        /* console.log(passwd)
+        console.log(sname)
+        console.log(ssex)
+        console.log(sage)
+        console.log(smail) */
+        // localStorage.setItem('acname', acname);
+        if (passwd == "" || sname == "" || ssex == "" || smail == "") {
+            ts.innerHTML = "请完整填写表单后提交!"
+            return
+        }
+        if (!validateEmailFormat(smail)) {
+        	ts.innerHTML="邮箱格式不正确!"
+        	return
+        }
+        ts.innerHTML=""
+        $.ajax({
+        	
+            url: "studentinfoaction",
+            data: {
+            	method : "updateInfo",
+            	sid : sid,
+            	passwd : passwd,
+            	sname : sname,
+            	ssex : ssex,
+            	sage : sage,
+            	smail : smail,
+            	flag : flag //"new" 表示新用户; "old" 表示已设置密码的用户
+            },
+            success: function (text) {
+            	if (text.indexOf("OK")>-1) {
+            		alert("OK")
+            	} else if (text.indexOf("MAILERROR")>-1) {
+            		ts.innerHTML="该邮箱已被其他人注册,无法修改"
+            	}
+            },
+            error : function() {
+            	alert("Fail")
+			}
+        });
+    }
+    
+    function validateEmailFormat(email) {
+        const reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/;
+        return reg.test(email);
+    }
+</script>

@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+	<title>教师信息管理</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<link href="../demo.css" rel="stylesheet" type="text/css" />
+	<script src="../../scripts/boot.js" type="text/javascript"></script> 
+</head> 
+<body>
+	<h1>教师信息数据表格</h1> 
+	<div style="width:1000px;"> 
+		<div class="mini-toolbar" style="border-bottom:0;padding:0px;"> 
+			<table style="width:100%;"> 
+				<tr> 
+					<td style="width:100%;"> 
+					</td> 
+					<td style="white-space:nowrap;"> 
+						<input id="key" class="mini-textbox" emptyText="请输入教师姓名" style="width:150px;" onenter="onKeyEnter" /> 
+						<a class="mini-button" onclick="search()">查询</a> 
+					</td> 
+				</tr> 
+			</table> 
+		</div> 
+	</div> 
+	<div id="datagrid1" class="mini-datagrid" style="width:1000px;height:310px;" allowAlternating="true" allowResize="true" 
+		 url="../../teacherinfoaction" idField="id" multiSelect="true">
+		<div property="columns"> 
+			<div field="tid" width="100" headerAlign="center" align="center" allowSort="true">工号</div> 
+			<div field="tname" width="100" headerAlign="center" align="center" allowSort="true">姓名</div> 
+			<div field="tsex" width="80" headerAlign="center" align="center">性别</div>
+			<div field="tage" width="80" headerAlign="center" align="center" allowSort="true">年龄</div>
+			<div field="tlvl" width="120" headerAlign="center" align="center">职称</div>
+			<div field="tmail" width="180" headerAlign="center" align="center">邮箱</div> 
+			<div name="action" width="120" headerAlign="center" align="center" renderer="onActionRenderer" cellStyle="padding:0;">操作</div>
+		</div> 
+	</div> 
+	
+<script type="text/javascript">
+	mini.parse();
+
+	var grid = mini.get("datagrid1");
+	grid.load();
+	grid.sortBy("tid", "asc");
+	
+	function onActionRenderer(e) {
+        var grid = e.sender;
+        var record = e.record;
+        var uid = record._id;
+        
+        var s = '<a href="javascript:void(0)" onclick="sgdt()">查看Ta的课题</a>'
+        return s;
+    }
+
+	function sgdt() {
+
+		var row = grid.getSelected();
+		//console.log(JSON.parse(JSON.stringify(row)).tid)   //获取到了该行的tid
+		if (row) {
+			var tid = JSON.parse(JSON.stringify(row)).tid
+			//console.log(row)
+			$.ajax({
+			    url: "../../gdtinfoaction",
+			    type: 'get',
+			    data: {
+			        //method: "tselect",//获取详情数据
+			        //tid: JSON.parse(JSON.stringify(row)).tid
+			    },
+			    cache: false,
+			    success: function (text) {
+			    	//console.log(text)
+			    	//var json = JSON.stringify(text);
+			    	//console.log("---"+json)
+			        mini.open({
+			            url: bootPATH + "../demo/CommonLibs/sGdtInfoWindow2.html",
+			            title: "教师课题信息",
+			            width: 600,
+			            height: 400,
+			            onload: function () {
+			            	var iframe = this.getIFrameEl();
+			                iframe.contentWindow.SetURL(tid);
+			            },
+			            ondestroy: function (action) {
+			                grid.reload();
+			            }
+			        });
+			    },
+			    error: function (jqXHR, textStatus, errorThrown) {
+			        alert(jqXHR.responseText);
+			    }
+			});
+		} else {
+			alert("请选中一条记录");
+		}
+
+	}
+	
+	function search() {
+		var key = mini.get("key").getValue();
+		grid.load({
+			find : key
+		});
+	}
+	function onKeyEnter(e) {
+		search();
+	}
+</script> <div class="description"> 
+	<h3 style="padding-top:20px;">Description</h3>
+	<p>
+		父界面: ①默认工号升序展示教师信息 可选(工号/姓名/年龄)列(升序/降序); ②按姓名模糊查询教师信息;
+	</p>
+	<p>
+		子界面: ①默认工号升序展示教师信息; ②按课题名称模糊查询课题信息; ③对课题状态为'申请中'/'已撤销申请'的课题可选操作'申请课题';
+	</p>
+	<p>
+		孙界面: ①由子界面点击'申请课题'打开,展示课题详细信息; ②可输入申请信息后提交申请;
+	</p>
+	<p>
+		数据来源: 父界面、子界面数据由父界面获取, 孙界面数据由子界面获取;
+	</p>
+ </div> </body> </html>

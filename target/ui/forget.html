@@ -1,0 +1,73 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+
+    </script>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <form role="form" action="javascript:void(0)" onsubmit="return check(this)"
+                  style="position: absolute;left: 40%;top: 30%;">
+                <h2 style="padding-left: 60px;">密&nbsp;码&nbsp;找&nbsp;回</h2>
+                <h5 id="ts" style="color:red;height: 5px"></h5>
+                <!--                <h3 id="loading" style="display:none;"></h3>-->
+                <div class="form-group">
+                    <label for="acname">用户名</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="text" class="form-control"
+                           id="acname" name="acname"
+                           placeholder="请输入学号或工号"/>
+                </div>
+                <button type="button" class="btn btn-default"
+                        style="width: 230px;height: 25px; margin-top: 30px;margin-left: 3px;" onclick="sendmail()">
+                    找回密码
+                </button>
+                <div style="margin-top: 20px;padding-left:150px;">
+                    <a href="login.html" type="button"
+                       style="color:darksalmon;font-size: 13px;">
+                        返回登录界面
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts = document.getElementById("ts")
+
+    function sendmail() {
+        ts.innerHTML = ""
+        var acname = document.getElementById("acname").value
+        // localStorage.setItem('acname', acname);
+        if (acname == "") {
+            ts.innerHTML = "用户名不能为空"
+            return
+        }
+        //ajex :google创新的一种应用
+        //asynchronous javascript and xml【返回数据格式，刚推出时使用较多，现在几乎都使用json格式】
+        if (httpreq == null) {
+            httpreq = new XMLHttpRequest()
+        }
+        httpreq.onreadystatechange = function () {
+            if (httpreq.readyState == 4 && httpreq.status == 200) {
+                var res = httpreq.responseText;
+                if (res.indexOf("FAIL") != -1) {
+                    ts.innerHTML = "无效的用户名"
+                } else {
+                    ts.innerHTML = "密码已发送至您的邮箱，请查收，正在返回登录界面..."
+                    setTimeout("window.location.href='login.html'", 5000)
+                }
+            }
+        }
+        httpreq.open("get", "rootAction?method=forget&acname=" + acname)//默认异步
+        httpreq.send()
+        ts.innerHTML = "正在为你处理，请稍后..."
+    }
+</script>

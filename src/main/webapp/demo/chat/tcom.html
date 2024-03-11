@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>课题信息</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script src="../../scripts/boot.js" type="text/javascript"></script>
+    <style type="text/css">
+        html, body {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+<form id="form2">
+    <div style="padding:5px;">
+        <p id="gdtname" style="width:400px;height:22px;margin-top: 20px;margin-bottom: 10px;font-size:20px;"></p>
+        <p>
+        	<span style="width:65px;font-size:20px;">学生:</span>
+        	<span id="sid" style="width:275px;font-size:20px;"></span>
+        </p>
+        <hr></hr>
+        <div>
+        	<button style="width: 160px;height: 40px;border-radius: 15px;margin-top: 20px;">
+        		<span>课题资料(施工中)</span>
+        	</button>
+        </div>
+        <div>
+        	<button style="width: 160px;height: 40px;border-radius: 15px;margin-top: 20px;margin-bottom: 20px;"
+        		onclick="chatwin()">
+        		<span>在线交流(施工中)</span>
+        	</button>
+        </div>
+        <hr></hr>
+    </div>
+</form>
+<script type="text/javascript">  
+	//从 localStorage 获取键为 'myObjectKey' 的值，并将其转换回对象  
+	var ldata = JSON.parse(localStorage.getItem('tdata'));  
+    var s = ldata.sid
+    var g = ldata.gdtname
+    function SetData() {  
+        $("#sid").text(s);  
+        $("#gdtname").text(g); 
+    }
+    SetData()
+    
+    function chatwin(){
+    	mini.open({
+            url: bootPATH + "../demo/chat/tchatwin.html",
+            title: s, width: 600, height: 400,
+            onload: function () {
+                var iframe1 = this.getIFrameEl();
+                iframe1.contentWindow.getChatRecords();
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
+    
+</script>
+</body>
+</html>

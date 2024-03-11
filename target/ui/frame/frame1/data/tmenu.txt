@@ -1,0 +1,4 @@
+﻿[
+    { "id": "t1", iconCls: "fa fa-table", text: "课题信息管理(datagrid)", url: "../../demo/datagrid/tgdt_info.html" },
+    { "id": "t2", iconCls: "fa fa-table", text: "申请信息管理(datagrid)", url: "../../demo/datagrid/tapply_info.html" }
+]

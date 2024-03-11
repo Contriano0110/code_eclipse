@@ -1,0 +1,287 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./scripts/boot.js" type="text/javascript"></script> 
+    <style>
+        /* 未选中状态的样式 */
+        .login-tab {
+            color: grey;
+            text-decoration: none;
+        }
+        /* 选中状态的样式 */
+        .login-tab.active {
+            color: black;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <form role="form" action="javascript:void(0)" style="position: absolute;left: 43%;top: 30%;">	
+            		
+    			
+    			<span class="login-tab" id="accountLogin" style="font-size:20px;cursor: pointer;">账号登录</span>
+    			<span class="login-tab" id="emailLogin" style="font-size:20px;cursor: pointer;margin-left:75px;">邮箱登录</span>
+    			<h5 style="height: 5px"></h5>
+    			
+    			<div class="content" id="accountContent">
+        			<!-- 这里放置账号登录相关内容 -->
+        			<div class="form-group">
+                    	<input style="height: 32px;padding-left: 10px;width: 240px;border-radius: 8px;"
+                           class="form-control" id="acname" name="acname" placeholder="请输入学号或工号"/>     
+                	</div>
+                
+                	<div class="form-group" style="margin-top: 30px;">
+						<input style="height: 32px;padding-left: 10px;width: 240px;border-radius: 8px;"
+                    	   type="password" class="form-control" id="passwd" name="passwd" placeholder="请输入密码"/>
+                    	
+                	</div>
+                	<div>
+                		<span id="ts2" style="color:red;padding-left:10px;height:30px;line-height: 30px;font-weight:bold;"> </span>
+                	</div>
+                	<div class="form-group">
+                		<button type="button" style="width: 240px;height: 30px;
+                			cursor: pointer;background-color: #ffcccc;border-radius: 8px;"onclick="login()">
+                    		登&nbsp;录
+                		</button>
+                	</div>
+                	<div style="margin-top: 15px;">
+                		<a href="zhuce.html" type = "button"style="color:darksalmon;font-size: 13px;margin-right:120px">立即注册</a>
+                    	<a href="forget.html" type="button" style="color:darksalmon;font-size: 13px;">忘记密码?</a>
+                	</div>
+    			</div>
+
+    			<div class="content" id="emailContent" style="display:none;position: relative;">
+        			<!-- 这里放置邮箱登录相关内容 -->
+        			<span style="position: absolute;left:0;top:-20;color:#888888" >验证即登录，未注册将自动创建账号</span>
+                	<div class="form-group" style="color:#8080ff;">
+                    	<input style="height: 32px;padding-left: 10px;width: 240px;border-radius: 8px;"
+                           	class="form-control" id="mail" name="mail"
+                           	placeholder="请输入邮箱"/>
+                        <span style="margin-left:-100px;color:#808080">|</span>
+                        <label for="option1" style="font-size:12px;cursor: pointer;">学生</label>
+                		<input type="radio" id="option1" name="options" value="s" style="margin-left: -4px;cursor: pointer;">
+                		<label for="option2" style="font-size:12px;margin-left: 5px;cursor: pointer;">教师</label>
+                		<input type="radio" id="option2" name="options" value="t" style="margin-left: -4px;cursor: pointer;"><br>
+                	</div>
+                	<div class="form-group" style="margin-top: 30px;">
+                    	<input style="height: 32px;padding-left: 10px;width: 240px;border-radius: 8px;"
+                           class="form-control" id="jiaoyan" name="jiaoyan"
+                           placeholder="请输入验证码"/>
+                    	<span style="margin-left:-100px;color:#808080">|</span>
+                    	<button type="button" id="send" style="height: 32px;width:80px;border:0;font-size:12px;
+                    		cursor: pointer;color:#8080ff;background-color: transparent;margin-left:0px;"
+                    		>发送验证码
+                    	</button>
+                	</div>
+                	<div>
+                		<span id="ts1" style="color:red;padding-left:10px;height:30px;line-height: 30px;font-weight:bold;"> </span>
+                	</div>
+                	<button type="button" id="tijiao"
+                        style="width: 240px;height: 30px;cursor: pointer;background-color: #ffcccc;
+                        border-radius: 8px;">登&nbsp;录
+                	</button>
+    			</div>
+                
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts1 = document.getElementById("ts1")
+    var ts2 = document.getElementById("ts2")
+    
+    const accountLoginBtn = document.getElementById('accountLogin');
+    const emailLoginBtn = document.getElementById('emailLogin');
+    const accountContent = document.getElementById('accountContent');
+    const emailContent = document.getElementById('emailContent');
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    	accountLoginBtn.classList.add('active');
+    	accountContent.style.display = 'block';
+    });
+
+    accountLoginBtn.addEventListener('click', () => {
+        accountLoginBtn.classList.add('active');
+        emailLoginBtn.classList.remove('active');
+        accountContent.style.display = 'block'; // 显示账密登录内容
+        emailContent.style.display = 'none'; // 隐藏邮箱登录内容
+    });
+
+    emailLoginBtn.addEventListener('click', () => {
+    	emailLoginBtn.classList.add('active');
+    	accountLoginBtn.classList.remove('active');
+        accountContent.style.display = 'none'; // 隐藏账密登录内容
+        emailContent.style.display = 'block'; // 显示邮箱登录内容
+    });
+
+    function login() {//账密登录
+        var acname = document.getElementById("acname").value
+        var passwd = document.getElementById("passwd").value
+        // localStorage.setItem('acname', acname);
+        if (acname == "" || passwd == "") {
+            ts2.innerHTML = "用户名或密码不能为空"
+            return
+        }
+        //ajex :google创新的一种应用
+        //asynchronous javascript and xml【返回数据格式，刚推出时使用较多，现在几乎都使用json格式】
+        if (httpreq == null) {
+            httpreq = new XMLHttpRequest()
+        }
+        httpreq.onreadystatechange = function () {
+            if (httpreq.readyState == 4 && httpreq.status == 200) {
+                var res = httpreq.responseText;
+                if (res.indexOf("fail!") != -1) {
+                    ts2.innerHTML = "无效的用户或密码"
+                } else {
+                    ts2.innerHTML = "登录成功，稍后带你去主页..."
+                    if (acname[0] == 'r') {
+                        //localStorage.setItem('racname', acname);
+                        setTimeout("window.location.href='frame/frame1/index.html'", 100)
+                    } else if (acname[0] == 's') {
+                        //localStorage.setItem('sacname', acname);
+                        setTimeout("window.location.href='frame/frame1/sindex.html'", 100)
+                    } else {
+                        //localStorage.setItem('tacname', acname);
+                        setTimeout("window.location.href='frame/frame1/tindex.html'", 100)
+                    }
+                }
+            }
+        }
+        httpreq.open("get", "rootAction?method=login&acname=" + acname + "&passwd=" + passwd)//默认异步
+        httpreq.send()
+    }
+    
+    var jy = '0000'
+        
+    document.getElementById('tijiao').addEventListener('click', function() {
+        var u
+        function getSelectedValue(){ //判断用户选择
+            var radios = document.getElementsByName('options'); 
+    		console.log(radios)
+            for(var i=0;i<radios.length;i++){
+                if (radios[i].checked) { // 判断当前单选按钮是否被选中
+                    u=radios[i].value
+                    break
+                }
+             }
+        }
+        getSelectedValue()
+        var mail = document.getElementById("mail").value
+        var jiaoyan = document.getElementById("jiaoyan").value
+        if (u == undefined) {
+            ts1.innerHTML = "请选择您的身份"
+            return
+        }
+        if (mail == '') {
+            ts1.innerHTML = "请输入邮箱"
+            return
+        }
+        if (!validateEmailFormat(mail)) {
+            ts1.innerHTML = "邮箱格式有误"
+            return
+        }
+        if (jiaoyan == '') {
+            ts1.innerHTML = "请输入验证码"
+            return
+        }
+        console.log(u)
+        if (jy != jiaoyan) {
+            ts1.innerHTML = "验证码错误"
+        } else {
+            // 发送AJAX请求到后端
+            $.ajax({
+        		url : "./rootAction",
+        		data : {
+        			method : "maillogin",
+        			mail : mail,
+        			u : u
+        		},
+        		success : function(text) {
+        			console.log(text)
+        			if (text.indexOf("login")>-1 && u == 's') {
+        				ts1.innerHTML = "验证成功, 正在为您登录主页..."
+                        setTimeout("window.location.href='frame/frame1/sindex.html'", 2000)
+        			} else if (text.indexOf("login")>-1 && u == 't') {
+        				ts1.innerHTML = "验证成功, 正在为您登录主页..."
+                        setTimeout("window.location.href='frame/frame1/tindex.html'", 2000)
+            		} else if (text.indexOf("zhuce")>-1 && u == 's') {
+        				ts1.innerHTML = "注册成功, 正在为您登录主页..."
+                        setTimeout("window.location.href='frame/frame1/sindex.html'", 2000)
+            		} else if (text.indexOf("zhuce")>-1 && u == 't') {
+        				ts1.innerHTML = "注册成功, 正在为您登录主页..."
+                        setTimeout("window.location.href='frame/frame1/tindex.html'", 2000)
+            		} 
+        		},
+        		error : function() {
+        		}
+        	});
+        }
+    })
+        
+    document.getElementById('send').addEventListener('click', function() {
+    	ts1.innerHTML = ''	
+        var button = this;
+        var countdownSpan = document.getElementById('countdown');
+        var countdownSeconds = 60;
+        	
+        var mail = document.getElementById("mail").value
+        console.log(mail)
+        if (mail == '') {
+        	ts1.innerHTML = '邮箱不能为空'
+        	return
+        }
+        if (!validateEmailFormat(mail)) {
+        	ts1.innerHTML = '邮箱格式有误'
+        	return
+        }
+        // 禁用按钮
+        button.disabled = true;
+
+        // 启动计时器
+        var countdownInterval = setInterval(function() {
+            countdownSeconds--;
+            button.textContent = '重新发送('+countdownSeconds+')';
+
+            if (countdownSeconds === 0) {
+                // 清除计时器
+                clearInterval(countdownInterval);
+
+                // 重新启用按钮
+                button.disabled = false;
+                button.textContent = '发送验证码';
+            }
+        }, 1000);
+
+        // 发送AJAX请求到后端
+        $.ajax({
+    		url : "./rootAction",
+    		data : {
+    			method : "jiaoyan",
+    			mail : mail
+    		},
+    		success : function(text) {	
+    			jy = text
+    			console.log(jy)
+    			ts1.innerHTML = ""
+    		},
+    		error : function() {
+    		}
+    	});
+    });
+        
+    function validateEmailFormat(email) {
+        const reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/;
+        return reg.test(email);
+    }
+    
+</script>

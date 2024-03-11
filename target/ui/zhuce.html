@@ -1,0 +1,120 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function check(frm) {
+            //所有的标签（html、xml）在js世界都是一个个对象
+            var acname = frm.acname.value;
+            var passwd = frm.passwd.value;
+            if (acname == "" || passwd == "") {
+                alert("账户或密码不能为空")
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <form role="form" action="javascript:void(0)"
+                  style="position: absolute;left: 40%;top: 20%;">
+                <h2 style="padding-left: 60px;">账&nbsp;号&nbsp;注&nbsp;册</h2>
+                <h5 id="ts" style="color:red;height: 5px"></h5>
+                <label for="option1">学生</label>
+                <input type="radio" id="option1" name="options" value="s">
+                <label for="option2" style="margin-left: 88px">老师</label>
+                <input type="radio" id="option2" name="options" value="t"><br>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="name" style="padding-right: 23px;">姓&nbsp;&nbsp;名</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="text"
+                           class="form-control" id="name" name="name"
+                           placeholder="请输入姓名"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="mail" style="padding-right: 23px;">邮&nbsp;&nbsp;箱</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;"
+                           class="form-control" id="mail" name="mail"
+                           placeholder="请输入邮箱"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="passwd" style="padding-right: 23px;">密&nbsp;&nbsp;码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="passwd" name="passwd"
+                           placeholder="请输入密码"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="passwd2" style="width: 300px;">确认密码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="passwd2" name="passwd2"
+                           placeholder="请确认密码"/>
+                </div>
+                <button type="button"
+                        style="width: 249px;height: 30px; margin-top: 30px;" onclick="zhuce()">
+                    立即注册!
+                </button>
+                <div style="margin-top: 15px;padding-left:134px;">
+                    <a href="login.html" type="button"
+                       style="color:darksalmon;font-size: 13px;">
+                        已有帐号?点此登陆!
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts = document.getElementById("ts")
+
+    function zhuce() {
+        var u
+        function getSelectedValue(){
+            var radios = document.getElementsByName('options'); // 获取所有名称为'gender'的单选按钮元素
+
+            for(var i=0;i<radios.length;i++){
+                if (radios[i].checked) { // 判断当前单选按钮是否被选中
+                    u=radios.value
+                    break
+                }
+            }
+        }
+        var name = document.getElementById("name").value
+        var mail = document.getElementById("mail").value
+        var passwd = document.getElementById("passwd").value
+        var passwd2 = document.getElementById("passwd2").value
+        if (u == "" || name == "" || mail == "" || passwd == "" || passwd2 == "") {
+            ts.innerHTML = "请完整填写表单信息!"
+            return
+        }
+        if (passwd != passwd2) {
+            ts.innerHTML = "两次密码不一致"
+        }
+        if (httpreq == null) {
+            httpreq = new XMLHttpRequest()
+            httpreq.onreadystatechange = function () {
+                if (httpreq.readyState == 4 && httpreq.status == 200) {
+
+                    var res = httpreq.responseText;
+                    if (res.indexOf("OLDERROR") != -1) {
+                        ts.innerHTML = "原密码错误"
+                    } else if (res.indexOf("FAIL") != -1) {
+                        ts.innerHTML = "修改失败"
+                    } else {
+                        alert("注册成功!为您分配的用户名为:"+res)
+                        ts.innerHTML = "注册成功, 正在为您跳转登录页面..."
+                        setTimeout("window.location.href='login.html'", 1000)
+                    }
+                }
+            }
+        }
+        httpreq.open("get", "rootAction?method=zhuce&u="+u+"&name=" + name + "&mail" + mail + "&passwd=" + passwd)//默认异步
+        httpreq.send()
+    }
+</script>

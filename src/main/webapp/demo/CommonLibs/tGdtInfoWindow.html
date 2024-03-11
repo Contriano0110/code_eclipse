@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>员工面板</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <script src="../../scripts/boot.js" type="text/javascript"></script>
+
+
+    <style type="text/css">
+        html, body {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<form id="form1" method="post">
+    <input name="id" class="mini-hidden"/>
+    <div style="padding-left:11px;padding-bottom:5px;">
+        <table style="table-layout:fixed;">
+            <tr>
+                <td style="display:none;width:80px;">课题编号：</td>
+                <td style="display:none;width:150px;">
+                    <input name="gdtid" class="mini-textbox" required="true" emptyText="请输入课题编号"/>
+                </td>
+                <td style="width:80px;">课题名称：</td>
+                <td>
+                    <input name="gdtname" class="mini-textbox" style="width:388px;" required="true" emptyText="请输入课题名称"/>
+                </td>
+            </tr>
+            <tr>
+            	<td style="width:80px;">课题类别：</td>
+            	<td>
+                	<input name="gdttype" class="mini-combobox" valueField="typeid" textField="typename" 
+                        url="../../gdtinfoaction?method=getgdttypes" required="true" emptyText="请选择课题类别"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:80px;">课题要求：</td>
+                <td style="width:388px;">
+                    <input style="width: 100%" name="gdtreq" class="mini-textbox" emptyText="请输入课题要求"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:80px;">课题介绍：</td>
+            	<td style="width:388px;">
+        			<input style="width: 100%;height:230px;" name="gdtintro" class="mini-textarea" emptyText="请输入课题介绍"/>
+               	</td>
+           	</tr>
+           	<tr style="display:none;">
+           		<td style="width:80px;">选题学生：</td>
+                <td style="width:150px;">
+                    <input name="sid" class="mini-textbox" required="false" emptyText="请输入选题学生"/>
+               	</td>
+           	</tr>
+        </table>
+        <div style="text-align:center;padding:10px;">
+            <a id="xgbtn" class="mini-button" onclick="onOk" style="width:60px;margin-right:20px;">确定</a>
+            <a class="mini-button" onclick="onCancel" style="width:60px;">取消</a>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+
+    mini.parse();
+
+
+    var form = new mini.Form("form1");    //或者 new FormData()
+
+    function SaveData() {
+        var o = form.getData();
+
+        form.validate();
+        if (form.isValid() == false) return;
+
+        var json = mini.encode([o]);
+        //console.log(json)
+
+
+        $.ajax({
+            url: "../../gdtinfoaction",
+            type: 'post',
+            data: {method: method, data: json},
+            cache: false,
+            success: function (text) {
+                CloseWindow("save");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseText);
+                CloseWindow();
+            }
+        });
+    }
+
+    ////////////////////
+    //标准方法接口定义
+    function SetData(data) {
+        method = data.action
+        if (data.action == "update") {
+            //跨页面传递的数据对象，克隆后才可以安全使用
+            data = mini.clone(data);
+            var gdtinfodata = data.gdtinfodata
+            gdtinfodata = JSON.parse(gdtinfodata)
+            form.setData(gdtinfodata)
+            // $.ajax({
+            //     url: "../../gdtinfoaction?method=getgdtinfos&amp;gdtid=" + data.id,
+            //     cache: false,
+            //     success: function (text) {
+            //         alert(text)
+            //         console.log(text)
+            //         var o = mini.decode(text);
+            //         form.setData(o);
+            //         form.setChanged(false);
+            //
+            //         //onDeptChanged();
+            //         //mini.getbyName("position").setValue(o.position);
+            //     },
+            //     error:function (e) {
+            //         alert(e)
+            //         console.log(e)
+            //
+            //     }
+            // });
+        }
+    }
+
+    function GetData() {
+        var o = form.getData();
+        return o;
+    }
+
+    function CloseWindow(action) {
+        if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+                return false;
+            }
+        }
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();
+    }
+
+    function onOk(e) {
+        SaveData();
+    }
+
+    function onCancel(e) {
+        CloseWindow("cancel");
+    }
+
+    //////////////////////////////////
+    function onDeptChanged(e) {
+        var deptCombo = mini.getbyName("dept_id");
+        var positionCombo = mini.getbyName("position");
+        var dept_id = deptCombo.getValue();
+
+        positionCombo.load("../data/AjaxService.jsp?method=GetPositionsByDepartmenId&id=" + dept_id);
+        positionCombo.setValue("");
+    }
+
+
+</script>
+</body>
+</html>

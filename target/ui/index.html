@@ -1,0 +1,101 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function check(frm) {
+            console.log("frm")
+            console.log(typeof frm)
+            //所有的标签（html、xml）在js世界都是一个个对象
+            var acname = frm.acname.value;
+            var passwd = frm.passwd.value;
+            if (acname == "" || passwd == "") {
+                alert("账户或密码不能为空")
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <form role="form" action="javascript:void(0)" onsubmit="return check(this)"
+                  style="position: absolute;left: 40%;top: 30%;">
+                <h2 style="padding-left: 60px;">账&nbsp;号&nbsp;登&nbsp;录</h2>
+                <h5 id="ts" style="color:red;height: 5px"></h5>
+                <div class="form-group">
+                    <label for="acname">用户名</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="text" class="form-control"
+                           id="acname" name="acname"
+                           placeholder="请输入学号或工号"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="passwd">密&nbsp;&nbsp;&nbsp;码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="passwd" name="passwd"
+                           placeholder="请输入密码"/>
+                </div>
+                <button type="button" class="btn btn-default"
+                        style="width: 105px;height: 25px; margin-top: 30px;margin-left: 0px;" onclick="login()">
+                    登&nbsp;录
+                </button>
+                <button type="button" class="btn btn-default"
+                        style="width: 105px;height: 25px; margin-top: 30px;margin-left: 17px;" onclick="window.location.href='zhuce.html'">
+                    注&nbsp;册
+                </button>
+                <div style="margin-top: 15px;padding-left:120px;">
+                    <a href="forget.html" type="button"
+                       style="color:darksalmon;font-size: 13px;">
+                        忘记密码?点此找回!
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts = document.getElementById("ts")
+
+    function login() {
+        var acname = document.getElementById("acname").value
+        var passwd = document.getElementById("passwd").value
+        // localStorage.setItem('acname', acname);
+        if (acname == "" || passwd == "") {
+            ts.innerHTML = "用户名或密码不能为空"
+            return
+        }
+        //ajex :google创新的一种应用
+        //asynchronous javascript and xml【返回数据格式，刚推出时使用较多，现在几乎都使用json格式】
+        if (httpreq == null) {
+            httpreq = new XMLHttpRequest()
+        }
+        httpreq.onreadystatechange = function () {
+            if (httpreq.readyState == 4 && httpreq.status == 200) {
+                var res = httpreq.responseText;
+                if (res.indexOf("fail!") != -1) {
+                    ts.innerHTML = "无效的用户和密码"
+                } else {
+                    ts.innerHTML = "登录成功，稍后带你去主页..."
+                    if (acname[0] == 'r') {
+                        //localStorage.setItem('racname', acname);
+                        setTimeout("window.location.href='frame/frame1/index.html'", 100)
+                    } else if (acname[0] == 's') {
+                        //localStorage.setItem('sacname', acname);
+                        setTimeout("window.location.href='frame/frame1/sindex.html'", 100)
+                    } else {
+                        //localStorage.setItem('tacname', acname);
+                        setTimeout("window.location.href='frame/frame1/tindex.html'", 100)
+                    }
+                }
+            }
+        }
+        httpreq.open("get", "rootAction?method=login&acname=" + acname + "&passwd=" + passwd)//默认异步
+        httpreq.send()
+    }
+</script>

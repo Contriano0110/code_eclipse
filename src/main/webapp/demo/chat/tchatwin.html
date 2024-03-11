@@ -1,0 +1,124 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <style>  
+        #chat-box {  
+            height: 285px;  
+            width: 550px;  
+            border: 1px solid #ccc;  
+            padding: 10px;  
+            overflow-y: scroll;  
+            
+         	/* 2代 */
+         	display: flex; /* 使用 flexbox 布局 */
+            flex-direction: column; 
+            
+        }  
+        #message-input {  
+            width: 480px;  
+            height: 28px;
+            border-radius: 8px;
+        }  
+        /* 对方消息样式 */
+        .other-message {
+        	max-width:450px;
+        	border-radius: 8px;
+            background-color: #f0f0f0;
+            color: #000;
+            padding: 5px;
+            margin-bottom: 10px;
+            align-self: flex-start; /* 将自己的消息靠左对齐 */
+            /*clear: both;  2代没这条 */
+            word-wrap: break-word; /* 允许断开单词 */  
+    		white-space: pre-wrap; /* 保留空白符并允许换行 */  
+        }
+
+        /* 自己消息样式 */
+        .my-message {
+        	max-width:450px;
+        	border-radius: 8px;
+            background-color: #0074d9;
+            color: #fff;
+            padding: 5px;
+            margin-bottom: 10px;
+            /* float: right; 2代将这条改为下一行所示 */
+            align-self: flex-end; /* 将自己的消息靠右对齐 */
+            word-wrap: break-word; /* 允许断开单词 */  
+    		white-space: pre-wrap; /* 保留空白符并允许换行 */              
+        }
+    </style>  
+</head>  
+<body>  
+    <div id="chat-box" style="margin-bottom: 10px;"></div>  
+    <input type="text" id="message-input" placeholder="输入消息...">  
+    <button onclick="sendMessage()" style="width: 65px;height: 32px;margin-left:7px;border-radius: 8px;">发送</button>  
+</body>  
+
+<script>
+var ldata = JSON.parse(localStorage.getItem('tdata'));  
+var sid = ldata.sid
+
+function sendMessage() {  
+    const messageInput = document.getElementById('message-input');  
+    const message = messageInput.value;  
+    if (message.trim() !== '') {  
+        // 使用Ajax将消息发送到服务器  
+        const xhr = new XMLHttpRequest();  
+        xhr.open('POST', '../../chataction?method=tsendmsg&sid='+sid, true);  
+        xhr.setRequestHeader('Content-Type', 'application/json');  
+        xhr.onreadystatechange = function () {  
+            if (xhr.readyState === 4 && xhr.status === 200) {  
+                // 消息发送成功，清空输入框  
+                messageInput.value = '';  
+                // 从服务器获取最新的聊天记录并显示  
+                getChatRecords();  
+            }  
+        };  
+        xhr.send(JSON.stringify({ message }));  
+    }  
+}  
+function getChatRecords() {  
+    const chatBox = document.getElementById('chat-box');  
+    const xhr = new XMLHttpRequest();  
+    if (sid !== null) {
+    	xhr.open('GET', '../../chataction?method=gettchat&sid='+sid, true);  
+    	xhr.onreadystatechange = function () {  
+        	if (xhr.readyState === 4 && xhr.status === 200) {  
+            	const records = JSON.parse(xhr.responseText);  
+            	chatBox.innerHTML = ''; // 清空聊天框  
+            	records.forEach(record => {  
+            		console.log(record)
+            		console.log(record.sender)
+           		 if (record.sender==sid) {
+           			const otherMessageElement = document.createElement('p');
+           			otherMessageElement.textContent = `${record.message}`;
+           			chatBox.appendChild(otherMessageElement); 
+           			otherMessageElement.classList.add('other-message'); // 添加类名
+           		} else {
+           			const myMessageElement = document.createElement('p');
+           			myMessageElement.textContent = `${record.message}`;
+           			chatBox.appendChild(myMessageElement); 
+           			myMessageElement.classList.add('my-message'); // 添加类名
+           		} 
+            	});  
+            	chatBox.scrollTop = chatBox.scrollHeight; // 滚动到最底部  
+        	}  
+    	};  
+    	xhr.send(); 
+    } 
+}  
+
+// 初始加载聊天记录  
+//getChatRecords();  
+  
+// 每隔一段时间自动获取新消息  
+//setInterval(getChatRecords(), 2000); // 每20秒获取一次  后续改为后端主动推送
+setInterval(function() {  
+	  getChatRecords();  
+	}, 2000);
+
+</script>
+
+</html>

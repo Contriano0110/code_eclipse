@@ -1,0 +1,5 @@
+﻿[
+    { "id": "s1", iconCls: "fa fa-table", text: "课题信息(xgtbl)", url: "../../demo/datagrid/sgdt_info.html" },
+    { "id": "s2", iconCls: "fa fa-table", text: "教师信息(xgtbl)", url: "../../demo/datagrid/steacher_info.html" },
+    { "id": "s3", iconCls: "fa fa-table", text: "申请信息(xgtbl)", url: "../../demo/datagrid/sapply_info.html" }
+]

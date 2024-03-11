@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>学生信息管理</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script src="../../scripts/boot.js" type="text/javascript"></script>
+    <style type="text/css">
+        html, body {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body style="height:100%">
+
+<form id="form1" method="post">
+    <input name="id" class="mini-hidden"/>
+    <div style="padding:5px;">
+    	<table>
+    		<tr><td style="font-size:18px;color:#985211;">
+    			-------------------------------------------学生信息------------------------------------------
+    		</td></tr>
+    	</table>
+        <table>
+            <tr>
+            	<td style="width:40px;">姓名:</td>
+                <td>
+                    <input name="sname" class="mini-textbox" style="width:140px" readonly/>
+                </td>
+                <td style="width:40px;">学号:</td>
+                <td>
+                    <input name="sid" class="mini-textbox" style="width:140px" readonly/>
+                </td>
+                <td style="width:40px;">年龄:</td>
+                <td>
+                    <input name="sage" class="mini-textbox" style="width:140px" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:40px;">性别:</td>
+                <td>
+                    <input name="ssex" class="mini-textbox" style="width:140px" readonly>
+                    </input>
+                </td>
+                <td style="width:40px;">邮箱:</td>
+                <td>
+                    <input name="smail" class="mini-textbox" style="width:140px" readonly/>
+                </td>           
+            </tr>
+        </table>
+		<table>
+			<tr><td style="font-size:18px;color:#985211;">
+				-------------------------------------------课题信息------------------------------------------
+			</td></tr>
+		</table>
+		<table>
+			<tr>
+				<td><input name="applyid" class="mini-textbox" style="display:none;"/></td>
+				<td><input id="status" name="status" class="mini-textbox" style="display:none;" value="b"/></td>
+			</tr>
+            <tr>
+                <td style="width:65px;">课题编号:</td>
+                <td>
+                    <input name="gdtid" class="mini-textbox" style="width:135px;" readonly/>
+                </td>
+                <td style="width:5%"></td>
+                <td style="width:65px;">课题名称:</td>
+                <td>
+                    <input name="gdtname" class="mini-textbox" style="width:250px;" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:65px;">申请时间:</td>
+                <td>
+                    <input name="applytime" class="mini-textbox" style="width:135px;" readonly>
+                    </input>
+                </td>
+                <td style="width:5%"></td>
+                <td style="width:65px;">回复时间:</td>
+                <td>
+                    <input name="replytime" class="mini-textbox" style="width:135px;" readonly/>
+                </td>           
+            </tr>
+        </table>
+		<table>
+			<tr><td style="font-size:18px;color:#985211;">
+				-------------------------------------------选题说明------------------------------------------
+			</td></tr>
+		</table>
+		<table>
+            <tr>
+                <td style="width:65px;">申请说明:</td>
+                <td style="height:100px;">
+                    <input class="mini-textarea" style="width: 485px;height:100%;" name="msg" readonly/>
+                </td>
+            </tr>
+        </table>
+            <a class="mini-button" id="xgbtn1" onclick="agree" style="color:green;width:100px;position:absolute;left:15%;bottom:5%;display:block;">同意此申请</a>
+            <a class="mini-button" id="xgbtn2" onclick="refuse" style="color:red;width:100px;position:absolute;left:42%;bottom:5%;display:block;">拒绝此申请</a>
+            <a class="mini-button" onclick="onCancel" style="width:100px;position:absolute;right:15%;bottom:5%">关闭窗口</a>
+    </div>
+</form>
+<script type="text/javascript">
+
+    mini.parse();
+    var form = new mini.Form("form1");    //或者 new FormData()
+    
+    /*  function doSomething() {
+        console.info("DOM loaded");
+        // 在这里执行你的操作
+    	console.log(detaildata)
+        const statusInput = document.getElementById('status');
+        
+        statusInput.value = "Hello, world!";
+        console.log(statusInput.value); // 确认值是否被正确设置
+        
+    	console.log(statusInput)
+    	console.log(statusInput.value) 
+    
+   	 	if (statusInput.value === '申请中') {
+    		console.log(statusInput.value)
+    		const buttons = document.getElementsByName('xgbtn');
+    		// 遍历 NodeList
+    		buttons.forEach(button => {
+    	    button.style.display = "none";
+    		});
+    	}
+    }  
+
+    if (document.readyState === "loading") {
+        // 页面尚未加载完成
+        document.addEventListener("DOMContentLoaded", doSomething);
+    } else {
+        // `DOMContentLoaded` 已经触发
+        doSomething();
+    }*/
+
+    ////////////////////
+    //标准方法接口定义
+    
+    function SetData(data) {
+        data = mini.clone(data);
+        var detaildata = data.detaildata
+       	console.log(detaildata)
+        detaildata = JSON.parse(detaildata)
+        form.setData(detaildata)
+       	console.log(detaildata)
+       	if (detaildata.status != '申请中') {
+       		var xgbtnElement1 = document.getElementById('xgbtn1');
+       	   	xgbtnElement1.style.display = 'none';
+       	 	var xgbtnElement2 = document.getElementById('xgbtn2');
+    	   	xgbtnElement2.style.display = 'none';
+       	}
+    }
+
+    function GetData() {
+        var o = form.getData();
+        return o;
+    }
+
+    function CloseWindow(action) {
+        if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+                return false;
+            }
+        }
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();
+    }
+
+    function agree(e) {
+    	var o = form.getData();
+    	//console.log(o);
+    	var sid = o.sid
+    	var gdtid = o.gdtid
+    	var applyid = o.applyid
+    	
+    	$.ajax({
+    		url: "../../applyinfoaction",
+    		type: "get",
+    		data:{method: "agree",sid: sid,applyid: applyid,gdtid: gdtid},
+    		success: function(text) {
+    			 CloseWindow("save");
+    		},
+    		error: function(jqXHR, textStatus, errorThrown) {
+    			 alert(jqXHR.responseText);
+                 CloseWindow();
+    		}
+    	})
+    }
+    
+    function refuse(e) {
+    	var o = form.getData();
+    	//console.log(o);
+    	var applyid = o.applyid
+    	
+    	$.ajax({
+    		url: "../../applyinfoaction",
+    		type: "get",
+    		data:{method: "refuse",applyid: applyid},
+    		success: function(text) {
+    			CloseWindow("save");
+    		},
+    		error: function(jqXHR, textStatus, errorThrown) {
+    			 alert(jqXHR.responseText);
+                 CloseWindow();
+    		}
+    	})
+    	
+    }
+
+    function onCancel(e) {
+        CloseWindow("cancel");
+    }
+
+    //////////////////////////////////
+    function onDeptChanged(e) {
+        var deptCombo = mini.getbyName("dept_id");
+        var positionCombo = mini.getbyName("position");
+        var dept_id = deptCombo.getValue();
+
+        positionCombo.load("../data/AjaxService.jsp?method=GetPositionsByDepartmenId&id=" + dept_id);
+        positionCombo.setValue("");
+    }
+
+
+</script>
+</body>
+</html>

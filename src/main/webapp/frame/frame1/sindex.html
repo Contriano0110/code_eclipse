@@ -1,0 +1,150 @@
+﻿<!doctype html><!-- html5比html4多了一些标签 属性-->
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <script src="../../scripts/boot.js" type="text/javascript"></script>
+    <link href="../../res/third-party/scrollbar/jquery.mCustomScrollbar.css" rel="stylesheet" type="text/css" />
+    <script src="../../res/third-party/scrollbar/jquery.mCustomScrollbar.concat.min.js" type="text/javascript"></script>
+    <link href="res/menu/menu.css" rel="stylesheet" type="text/css" />
+    <script src="res/menu/menu.js" type="text/javascript"></script>
+    <script src="res/menutip.js" type="text/javascript"></script>
+    <link href="res/tabs.css" rel="stylesheet" type="text/css" />
+    <link href="res/frame.css" rel="stylesheet" type="text/css" />
+    <link href="res/index.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+
+<div class="navbar">
+    <div class="navbar-header">
+        <div class="navbar-brand">学生系统</div>
+        <div class="navbar-brand navbar-brand-compact">学</div>
+    </div>
+    <ul class="nav navbar-nav">
+        <li><a id="toggle"><span class="fa fa-bars" ></span></a></li>
+    </ul>
+    <ul class="nav navbar-nav" style="width: 800px;">
+    	<li style="padding-left: 300px;font-size: 26px;line-height: 50px;">欢迎使用毕设选题系统(学生版)</li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <li ><a href="#" id="time"></a></li>
+        <li><a href="../../changepwd.html"><i class="fa fa-pencil-square-o"></i>修改密码</a></li>
+        <li class="dropdown">
+            <a class="dropdown-toggle userinfo">
+                <img class="user-img" src="res/images/qq.jpg" />个人资料<i class="fa fa-angle-down"></i>
+            </a>
+            <ul class="dropdown-menu pull-right">
+                <li ><a href="../../sinfo.html"><i class="fa fa-eye "></i> 用户信息</a></li>
+                <li><a href="../../rootAction?method=logout"><i class="fa fa-user"></i> 退出登录</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="sidebar-toggle"><i class = "fa fa-fw fa-dedent" ></i></div>
+        <div id="mainMenu"></div>
+    </div>
+
+    <div class="main">
+        <div id="mainTabs" class="mini-tabs main-tabs" activeIndex="0" style="height:100%;" plain="false"
+             buttons="#tabsButtons" arrowPosition="side" >
+            <div name="index" iconCls="fa-android" title="控制台">
+                MiniUI导航框架
+            </div>
+        </div>
+        <div id="tabsButtons">
+            <a class="tabsBtn"><i class="fa fa-home"></i></a>
+            <a class="tabsBtn"><i class="fa fa-refresh"></i></a>
+            <a class="tabsBtn"><i class="fa fa-remove"></i></a>
+            <a class="tabsBtn"><i class="fa fa-arrows-alt"></i></a>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script>
+	function checkInfo() {
+		$.ajax({
+            url: "../../rootAction",
+            data: {
+            	method: "checkinfo"
+            },
+            success: function (text) {
+                if (text.indexOf("FAIL")>-1) {
+                	// 存在空值, 需要弹窗提醒
+                	alert("请尽快到个人中心完善信息!")
+                }
+            }
+        })
+	}
+	
+	checkInfo()
+
+    function setDate() {
+        var d=new Date();
+        s=d.getYear()+1900+"-"+(d.getMonth()+1)+"-"+d.getDate()
+            +" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()
+        document.getElementById("time").innerHTML =s
+    }
+    setInterval("setDate()",1000)
+
+    function activeTab(item) {
+        var tabs = mini.get("mainTabs");
+        var tab = tabs.getTab(item.id);
+        if (!tab) {
+            tab = { name: item.id, title: item.text, url: item.url, iconCls: item.iconCls, showCloseButton: true };
+            tab = tabs.addTab(tab);
+        }
+        tabs.activeTab(tab);
+    }
+
+    $(function () {
+
+        //menu
+        var menu = new Menu("#mainMenu", {
+            itemclick: function (item) {
+                if (!item.children) {
+                    activeTab(item);
+                }
+            }
+        });
+
+        $(".sidebar").mCustomScrollbar({ autoHideScrollbar: true });
+
+        new MenuTip(menu);
+
+        $.ajax({
+            url: "data/smenu.txt",
+            success: function (text) {
+                var data = mini.decode(text);
+                menu.loadData(data);
+            }
+        })
+
+        //toggle
+        $("#toggle, .sidebar-toggle").click(function () {
+            $('body').toggleClass('compact');
+            mini.layout();
+        });
+
+        //dropdown
+        $(".dropdown-toggle").click(function (event) {
+            $(this).parent().addClass("open");
+            return false;
+        });
+
+        $(document).click(function (event) {
+            $(".dropdown").removeClass("open");
+        });
+    });
+
+</script>

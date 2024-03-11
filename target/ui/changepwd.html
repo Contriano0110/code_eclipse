@@ -1,0 +1,96 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function check(frm) {
+            //所有的标签（html、xml）在js世界都是一个个对象
+            var acname = frm.acname.value;
+            var passwd = frm.passwd.value;
+            if (acname == "" || passwd == "") {
+                alert("账户或密码不能为空")
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body style="background-image: url('sourse/log.jpg');background-size: 100%">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <form role="form" action="javascript:void(0)"
+                  style="position: absolute;left: 40%;top: 25%;">
+                <h2 style="padding-left: 72px;">修&nbsp;改&nbsp;密&nbsp;码</h2>
+                <h5 id="ts" style="color:red;height: 5px"></h5>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="oldpasswd">输入原密码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="oldpasswd" name="oldpasswd"
+                           placeholder="请输入原密码"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="passwd">输入新密码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="passwd" name="passwd"
+                           placeholder="8~12位数字和字母组合"/>
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <label for="passwd2">确认新密码</label>
+                    <input style="height: 25px;margin-left:10px;padding-left: 10px;" type="password"
+                           class="form-control" id="passwd2" name="passwd2"
+                           placeholder="请确认新密码"/>
+                </div>
+                <button type="button" class="btn btn-default"
+                        style="width: 120px;height: 25px; margin-top: 30px;margin-left: 0px;" onclick="changepwd()">
+                    修改密码
+                </button>
+                <a href="frame/frame1/index.html">
+                      <button type="button" class="btn btn-default"
+                        style="width: 120px;height: 25px; margin-top: 30px;margin-left: 20px;">
+                    取消
+                </button> 
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var httpreq = null;
+    var ts = document.getElementById("ts")
+
+    function changepwd() {
+        var oldpasswd = document.getElementById("oldpasswd").value
+        var passwd = document.getElementById("passwd").value
+        var passwd2 = document.getElementById("passwd2").value
+        if (oldpasswd ==""||passwd==""||passwd2=="") {
+            ts.innerHTML = "密码不能为空"
+            return
+        }
+        if (passwd != passwd2) {
+            ts.innerHTML = "两次密码不一致"
+        }
+        if (httpreq == null) {
+            httpreq = new XMLHttpRequest()
+            httpreq.onreadystatechange = function () {
+                if (httpreq.readyState == 4 && httpreq.status == 200) {
+
+                    var res=httpreq.responseText;
+                    if (res.indexOf("OLDERROR")!=-1) {
+                        ts.innerHTML="原密码错误"
+                    } else if (res.indexOf("FAIL")!=-1){
+                        ts.innerHTML="修改失败"
+                    } else {
+                        ts.innerHTML="修改成功, 正在为您跳转..."
+                        setTimeout("window.location.href='frame/frame1/sindex.html'", 100)
+                    }
+                }
+            }
+        }
+        httpreq.open("get", "rootAction?method=changepwd&oldpasswd=" + oldpasswd + "&passwd=" + passwd)//默认异步
+        httpreq.send()
+    }
+</script>

@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+	<title>申请信息管理</title> 
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<link href="../demo.css" rel="stylesheet" type="text/css" />
+	<script src="../../scripts/boot.js" type="text/javascript"></script> 
+</head> 
+<body>
+	<h1>申请信息数据表格</h1> 
+	<div style="width:1200px;"> 
+		<div class="mini-toolbar" style="border-bottom:0;padding:0px;"> 
+			<table style="width:100%;"> 
+				<tr> 
+					<td style="width:100%;"> 
+					</td> 
+					<td style="white-space:nowrap;"> 
+						<input id="key" class="mini-textbox" emptyText="请输入课题名" style="width:150px;" onenter="onKeyEnter" /> 
+						<a class="mini-button" onclick="search()">查询</a> 
+					</td> 
+				</tr> 
+			</table> 
+		</div> 
+	</div> 
+	<div id="datagrid1" class="mini-datagrid" style="width:1200px;height:280px;" allowAlternating="true" allowResize="true" 
+		 url="../../applyinfoaction?method=select" idField="id" showEmptyText="true" emptyText="暂未申请!"> 
+		<div property="columns"> 
+			<div field="applyid" width="100" headerAlign="center" align="center" allowSort="true">申请流水号</div> 
+			<div field="gdtid" width="100" headerAlign="center" align="center" allowSort="true">申请课题号</div>
+			<div field="gdtname" width="190" headerAlign="center" allowSort="true">课题名称</div>
+			<div field="applytime" type="date" width="100" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="true">申请时间</div> 
+			<div field="replytime" type="date" width="100" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="true">回复时间</div> 
+			<div field="status" width="80" headerAlign="center" align="center" allowSort="true">申请状态</div>
+			<div name="action" width="80" headerAlign="center" align="center" renderer="onActionRenderer" cellStyle="padding:0;">操作</div>
+		</div> 
+	</div> 
+	<fieldset style="width:1200px;border:solid 1px #aaa;margin-top:8px;position:relative;">
+        <legend>申请详细信息</legend>
+        <div id="editForm1" style="padding:5px;">
+            <input class="mini-hidden" name="id"/>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:80px;">申请编号：</td>
+                    <td style="width:150px;"><input name="applyid" class="mini-textbox" emptyText="***请先选中一条记录***" readonly /></td>
+                    <td style="width:80px;">课题编号：</td>
+                    <td style="width:150px;"><input name="gdtid" class="mini-textbox" readonly /></td>
+                    <td style="width:80px;">所属教师：</td>
+                    <td style="width:150px;"><input name="tname" class="mini-textbox" readonly /></td>
+                    <td style="width:80px;">教师工号：</td>
+                    <td style="width:150px;"><input name="tid" class="mini-textbox" readonly /></td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+            	<tr>
+                    <td style="width:99px;">申请说明：</td>
+                    <td><input name="msg" class="mini-textarea" style="width:1026px;" readonly/></td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+	
+<script type="text/javascript">
+	mini.parse();
+
+	var grid = mini.get("datagrid1");
+	grid.load();
+	grid.sortBy("applyid", "asc");
+	
+	//绑定表单
+    var db = new mini.DataBinding();
+    db.bindForm("editForm1", grid);
+	
+	function onActionRenderer(e) {
+        var grid = e.sender;
+        var record = e.record;
+        var uid = record._id;
+        console.log(record.status)
+        var s;
+        if (record.status == '申请中') {
+        	s = '<a href="javascript:void(0)" onclick="sdelete()">撤销申请</a>'
+        } else {
+        	s = '/';
+        }
+        return s;
+    }
+
+
+	 function sdelete() {
+		var row = grid.getSelected();
+		if (row) {
+			if (window.confirm("确定要撤销申请吗?")) {
+				//console.log(row)
+				$.ajax({
+					url : "../../applyinfoaction",
+					type : 'get',
+					data : {
+						method : "sdelete",//获取详情数据
+						applyid : row.applyid
+					},
+					cache : false,
+					success : function(text) {
+						alert("撤销成功")
+						grid.reload();
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						alert(jqXHR.responseText);
+					}
+				})
+			}
+		} else {
+			alert("请选中一条记录");
+		}
+	} 
+
+	function search() {
+		var key = mini.get("key").getValue();
+		grid.load({
+			find : key
+		});
+	}
+	function onKeyEnter(e) {
+		search();
+	}
+	/////////////////////////////////////////////////
+</script> <div class="description"> 
+	<h3 style="padding-top:10px;">Description</h3> 
+	<div>
+		主表: ①默认申请流水号升序排列, 可选(申请流水号/申请课题号/课题名称/申请时间)按(升序/降序)排列展示; ②可对状态为申请中的记录进行撤销操作;
+	</div>
+	<div>
+		从表: ①选中主表某条记录时,展示此记录的额外信息
+	</div>
+</div> </body> </html>
